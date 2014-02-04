@@ -13,39 +13,36 @@ npp install moderate
 </pre>
 
 
-### Example application
+### Use 
 
-Say you have a crawler. This crawl takes links, gets the html, and the stores it to some db. This is the only thing the crawler does. 
+The example below is a crawler. It picks links off a queue, crawls, and then saves them.
 
-<pre>
+    var moderate = require('moderate');
+    var limit = 100; // concurrency 
+    var ttl = (60 * 1000); // n ms to expiration
+    var urls = []; // n urls
 
-var moderate = require('moderate');
-var limit = 100; // concurrency 
-var ttl = (60 * 1000); // n ms to expiration
-var urls = []; // n urls
+    setTimeout(function () {
 
-setTimeout(function () {
+      moderate.active(function (active) {
 
-  moderate.active(function (active) {
-  
-    if (active < limit) {
+        if (active < limit) {
 
-      moderate.add({
-        mem: url,
-        ttl: ttl
+          moderate.add({
+            mem: url,
+            ttl: ttl
+          });
+
+          // make request
+          // wait ... 
+          // save
+
+          moderate.del(url);
+    
+        }
+
       });
+    
+    }, 1000);
 
-      // request url
-      // ... 
-      // save
-
-      moderate.del(url);
-
-    }
-  
-  });
-
-}, 1000);
-
-</pre>
-
+Instead of recursively calling the function when a page returns, moderate keeps track of how many callbacks are on the stack, albiet it's not that automatic because developers still have to manually specificy what to keep track of, but effectively this allows node to fly.
