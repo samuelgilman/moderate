@@ -41,6 +41,14 @@ The example below is a crawler. It picks links off a queue, crawls, and then sav
 
         if (active < limit) {
 
+          // maybe spop from redis or results
+          // from a mongo query range, basically
+          // an endless process that constanly
+          // requires attention and happends to be
+          // io intensive
+
+          var url = urls.pop();
+
           moderate.add({
             mem: url,
             ttl: ttl
@@ -50,7 +58,7 @@ The example below is a crawler. It picks links off a queue, crawls, and then sav
           // until your limit is greater than
           // the active number of members 
 
-          ready(); 
+          process(); 
 
           request({
 
