@@ -21,7 +21,6 @@ See the documented `test/example.js`.
 
 #### add
 
-    #!Javascript
     moderate.add({
         mem: /* task member key */,
         ex: /* task estimated expiry time in msecs */
@@ -39,7 +38,6 @@ See the documented `test/example.js`.
 
 #### active
 
-    #!Javascript
     moderate.active(function(NumOfActiveTasks) {
         // decide if to continue with your task
         // based on the current number of active
@@ -50,3 +48,8 @@ See the documented `test/example.js`.
 the number of currently active tasks. The callback function then should
 decide, based upon that number, if to continue with the task.
 
+#### del
+
+    moderate.del(mem);
+
+`del` signals 'Moderate' that the task member `mem` is no longer active.

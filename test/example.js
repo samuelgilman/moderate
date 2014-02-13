@@ -28,7 +28,7 @@ var moderate = require('../'); //require moderate (package in parent dir)
 
 var limit = 100; // Number of concurent page requests.
 var ttl = (60 * 1000); // If a URL is not crawled within 60 secs, discard it.
-var urls = []; //  A (theoretically) huge dynamically increasing pool of urls.
+var urls = ['http://www.google.com']; // A (theoretically) huge pool of urls.
 var interval = 3000; // check for new urls in 'urls' every n msec.
 var timeout = 5000; //HTTP request timeout
 
@@ -70,40 +70,46 @@ function process() {
             // get the next url to process from the pool:
             var url = urls.pop();
 
-            // inform moderate of a new active task associated with this
-            // url. also provide a ttl as an estimate for the maximum time
-            // required to perform this task. the ttl is usefull for cases
-            // in which there is some I/O error, and the associated task event
-            // handler is never called. Then the task it automatically
-            // discarded, eventhough we did not properly inform 'Moderate'
-            // of its completion.
-            moderate.add({
-                mem: url, // task member
-                ex: ttl // expiry time
-            });
+            if (url) {
 
-            // recursively add tasks until the limit of active members
-            // is reached.
-            process();
+                // inform moderate of a new active task associated with this
+                // url. also provide a ttl as an estimate for the maximum time
+                // required to perform this task. the ttl is usefull for cases
+                // in which there is some I/O error, and the associated task
+                // event handler is never called. Then the task it automatically
+                // discarded, eventhough we did not properly inform 'Moderate'
+                // of its completion.
+                moderate.add({
+                    mem: url, // task member
+                    ex: ttl // expiry time
+                });
 
-            // perform the current I/O task - send an HTTP request for
-            // the current url.
-            request({
+                // recursively add tasks until the limit of active members
+                // is reached.
+                process();
 
-                uri: uri,
-                timeout: timeout
+                // perform the current I/O task - send an HTTP request for
+                // the current url.
+                request({
 
-            }, function(err, res, body) {
+                    uri: url,
+                    timeout: timeout
 
-                // when the I/O is done, handle the result with this callback.
-                // after the data was processed inform moderate the task
-                // is completed.
-                // If for some reason this never gets called the task will
-                // expire eventuall based on the ttl passed when added.
+                }, function(err, res, body) {
 
-                moderate.del(url):
+                    // when the I/O is done, handle the result with this
+                    // callback.
+                    console.log(body);
 
-            });
+                    // after the result data was processed inform moderate the
+                    // task is completed by calling the 'del' method.
+                    // If for some reason this never gets called the task will
+                    // expire eventuall based on the ttl passed when added.
+                    moderate.del(url);
+
+                });
+
+            }
 
         }
 

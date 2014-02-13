@@ -12,10 +12,9 @@
     },
     "devDependencies": {
         "mocha": "1.17.1",
-        "logz": "1.1.0"
+        "sinon": "1.8.1"
     },
     "scripts": {
-        "unit": "mocha -R spec ./test/unit/",
-        "example": "node ./test/example.js"
+        "unit": "mocha -R spec ./test/unit/"
     }
 }
