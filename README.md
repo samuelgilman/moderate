@@ -1,93 +1,55 @@
 # Moderate
 
-A Node.js module to manage concurrency.
+A Node.js module to manage concurrency of I/O intensive tasks.
 
 ## What is it
 
-This module aims to help Node.js applications untilize their full non blocking potential by adding callbacks to the stack at a non blocking pace but with moderation to prevent stackoverflows.
+This module aims to help Node.js applications untilize their full non blocking
+potential when dealing with I/O intensive tasks. 
+In applications with a large number of such tasks, management of the callback
+event handlers queue is required in order to prevent overloading.
+'Moderate' helps adding callbacks to the queue at a non blocking pace, but with
+moderation to prevent overflows.
 
 ### Install
 
-<pre>
-npp install moderate
-</pre>
+`npp install moderate`
 
+### Use
 
-### Use 
+See the documented `test/example.js`.
 
-The example below is a crawler. It picks links off a queue, crawls, and then saves them.
+#### add
 
-    var request = require('request');
-    var moderate = require('moderate');
-    var limit = 100; 
-    var ttl = (60 * 1000); 
-    var urls = []; 
-    var interval = 3000;
-    var timeout = 5000;
+    moderate.add({
+        mem: /* task member key */,
+        ex: /* task estimated expiry time in msecs */
+    });
 
-    function ready () {
+`add` receives a `param` object with two keys:
 
-      process();
+1. `mem`: Task member key which is used to identify the task.
+2. `ex`: an estimate for the maximum time (in msecs) required to perform
+   this task.  
+   Usefull for cases in which there is some I/O error, and the associated
+   task event handler is never called. Then the task is automatically
+   discarded, eventhough we did not properly inform 'Moderate' of its
+   completion with `del`.
 
-      setTimeout(function () {
-        ready();
-      }, interval);
+#### active
 
-    }
+    moderate.active(function(NumOfActiveTasks) {
+        // decide if to continue with your task
+        // based on the current number of active
+        // tasks.
+    });
 
-    function process () {
+`active` receives a callback function as a parameter, and sends it
+the number of currently active tasks. The callback function then should
+decide, based upon that number, if to continue with the task.
 
-      moderate.active(function (active) {
+#### del
 
-        if (active < limit) {
+    moderate.del(mem);
 
-          // maybe spop from redis or results
-          // from a mongo query range, basically
-          // an endless process that constanly
-          // requires attention and happends to be
-          // io intensive
-
-          var url = urls.pop();
-
-          moderate.add({
-            mem: url,
-            ttl: ttl
-          });
-
-          // recursively add to the stack
-          // until your limit is greater than
-          // the active number of members 
-
-          process(); 
-
-          request({
-
-            uri: uri,
-            timeout: timeout 
-
-          }, function (err, stuff){
-
-            // process
-            // save    
-
-            // after you have procesed you stuff
-            // free up the stack by deleting the
-            // member from moderate. If for some
-            // reason this never gets called the
-            // members will expire eventuall based
-            // on the ttl you passed when added 
-
-            moderate.del(url):
-
-          });
-
-        }
-
-      });
-
-    };
-
-    process();
-  
-
-Instead of recursively calling a function when a page returns, moderate keeps track of how many callbacks are on the stack, albiet it's not that automatic because developers still have to manually specificy what to keep track of, but effectively this allows node to fly.
+`del` signals 'Moderate' that the task member `mem` is no longer active.

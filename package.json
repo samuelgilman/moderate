@@ -1,10 +1,20 @@
 {
-  "name": "moderate",
-  "version": "1.0.1",
-  "private": false,
-  "engines": {
-    "node": "*",
-    "npm": "*"
-  },
-  "dependencies": {}
+    "name": "moderate",
+    "version": "1.0.1",
+    "private": false,
+    "engines": {
+        "node": "*",
+        "npm": "*"
+    },
+    "main": "lib/index.js",
+    "dependencies": {
+        "collections": "0.2.2"
+    },
+    "devDependencies": {
+        "mocha": "1.17.1",
+        "sinon": "1.8.1"
+    },
+    "scripts": {
+        "unit": "mocha -R spec ./test/unit/"
+    }
 }
