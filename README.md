@@ -19,11 +19,34 @@ moderation to prevent overflows.
 
 See the documented `test/example.js`.
 
-#### Add
+#### add
 
-  #!Javascript
-  moderate.add({
-    mem: /* task member key */,
-    ex: /* task estimated expiry time in msecs */
-  });
+    #!Javascript
+    moderate.add({
+        mem: /* task member key */,
+        ex: /* task estimated expiry time in msecs */
+    });
+
+`add` receives a `param` object with two keys:
+
+1. `mem`: Task member key which is used to identify the task.
+2. `ex`: an estimate for the maximum time (in msecs) required to perform
+   this task.  
+   Usefull for cases in which there is some I/O error, and the associated
+   task event handler is never called. Then the task is automatically
+   discarded, eventhough we did not properly inform 'Moderate' of its
+   completion with `del`.
+
+#### active
+
+    #!Javascript
+    moderate.active(function(NumOfActiveTasks) {
+        // decide if to continue with your task
+        // based on the current number of active
+        // tasks.
+    });
+
+`active` receives a callback function as a parameter, and sends it
+the number of currently active tasks. The callback function then should
+decide, based upon that number, if to continue with the task.
 

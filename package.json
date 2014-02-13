@@ -7,6 +7,9 @@
         "npm": "*"
     },
     "main": "lib/index.js",
+    "dependencies": {
+        "collections": "0.2.2"
+    },
     "devDependencies": {
         "mocha": "1.17.1",
         "logz": "1.1.0"
